@@ -8,8 +8,22 @@ The encryption process is designed to obfuscate the binary's content, making it 
 
 This project requires a deep understanding of the ELF file format, encryption algorithms, and low-level programming in C and potentially assembly language for performance-critical sections. The final deliverable must include a Makefile with compilation instructions and adhere to best coding practices for security and efficiency.
 
+# useful
+```bash
+debian@ov-74088f:/tmp$ echo -e  '#include <stdio.h>\n int main() {printf("hello world");}' | gcc  -x c - -c  -o hello.o
+debian@ov-74088f:/tmp$ objcopy --add-section .mydata=mydata --set-section-flags .mydata=noload,readonly hello.o hello2.o
+debian@ov-74088f:/tmp$ objdump -sj .mydata hello
 
-#link
+hello:     file format elf64-x86-64
+
+Contents of section .mydata:
+ 0000 64617461 20616464 65642074 6f206865  data added to he
+ 0010 6c6c6f0a                             llo.            
+debian@ov-74088f:/tmp$ 
+```
+
+
+# link
 https://sourceware.org/legacy-ml/binutils/2008-06/msg00216.html
 https://stackoverflow.com/questions/233358/elf-file-headers
 https://github.com/thorkill/eresi
