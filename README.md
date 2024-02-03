@@ -29,7 +29,7 @@ https://stackoverflow.com/questions/233358/elf-file-headers
 https://github.com/thorkill/eresi
 https://sourceforge.net/p/elftoolchain/wiki/Home/
 
-
+http://dbp-consulting.com/tutorials/debugging/linuxProgramStartup.html
 
 https://netspooky.medium.com/elf-binary-mangling-part-1-concepts-e00cb1352301
 http://phrack.org/issues/58/5.html#article
