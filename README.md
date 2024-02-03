@@ -28,3 +28,10 @@ https://sourceware.org/legacy-ml/binutils/2008-06/msg00216.html
 https://stackoverflow.com/questions/233358/elf-file-headers
 https://github.com/thorkill/eresi
 https://sourceforge.net/p/elftoolchain/wiki/Home/
+
+
+
+https://netspooky.medium.com/elf-binary-mangling-part-1-concepts-e00cb1352301
+http://phrack.org/issues/58/5.html#article
+https://violentbinary.github.io/posts/1-elf-static-injection-to-load-malicious-dynamic-link-library/
+https://fasterthanli.me/series/making-our-own-executable-packer
