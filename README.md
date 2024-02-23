@@ -69,3 +69,9 @@ https://c9x.me/x86/html/file_module_x86_id_147.html
 
 
 nasm -f elf64 ./src/stub.asm; objdump -D ./src/stub.o | cut -f 2
+
+
+
+nasm -f elf64 ./src/stub.asm && objdump -s -x -j .text ./src/stub.o  | cut -f 2
+hexdump -n 62 -s 384 -v -e '/1 "0x%02x,"' ./src/stub.o
+

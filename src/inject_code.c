@@ -1,36 +1,12 @@
 #include "utils.h"
 
 #define CODE_SIZE sizeof(CODE_STUB)
-#define JMP_INDEX 46
+#define JMP_INDEX 43
+
 
 
 unsigned char CODE_STUB[] = {
-		0x9c,
-		0x50,
-		0x57,
-		0x56,
-		0x54,
-		0x52,
-		0x51,
-		0x41, 0x50,
-		0x41, 0x51,
-		0x6a, 0x41,
-		0xbf, 0x01, 0x00, 00, 00,
-		0x48, 0x89, 0xe6,
-		0xba, 0x01, 0x00, 0x00, 0x00,
-		0xb8, 0x01, 0x00, 0x00, 0x00,
-		0x0f, 0x05,
-		0x58,
-		0x41, 0x59,
-		0x41, 0x58,
-		0x59,
-		0x5a,
-		0x5c,
-		0x5e,
-		0x5f,
-		0x58,
-		0x9d,
-		0xe9, 0xfb, 0xff, 0xff, 0xff
+        0x9c,0x50,0x57,0x56,0x54,0x52,0x51,0x41,0x50,0x41,0x51,0xeb,0x22,0xbf,0x01,0x00,0x00,0x00,0x5e,0xba,0x09,0x00,0x00,0x00,0xb8,0x01,0x00,0x00,0x00,0x0f,0x05,0x41,0x59,0x41,0x58,0x59,0x5a,0x5c,0x5e,0x5f,0x58,0x9d,0xe9,0xfb,0xff,0xff,0xff,0xe8,0xd9,0xff,0xff,0xff,0x5f,0x5f,0x57,0x4f,0x4f,0x44,0x59,0x5f,0x5f,0x00
 };
 
 
@@ -49,18 +25,23 @@ Elf64_Phdr *find_cave(Elf64_Ehdr *ehdr, Elf64_Phdr *phdr)
 	return NULL;
 }
 
-void insert_code(unsigned char *data, Elf64_Addr last_entry, Elf64_Addr new_entry)
+void insert_code(unsigned char *data, unsigned char *key,
+     Elf64_Addr last_entry, Elf64_Addr new_entry)
 {
 	int32_t	rel_entry;
 
 	rel_entry =  last_entry - (new_entry + JMP_INDEX + sizeof(int32_t));
-	printf("rel entry => %x\n", rel_entry);
+	printf("[x] new rel entry for jump => %x\n", rel_entry);
 	memcpy(CODE_STUB + JMP_INDEX, &rel_entry, sizeof(int32_t));
+    memcpy(CODE_STUB + CODE_SIZE - KEY_SIZE, &key, KEY_SIZE);
+
+
 	memcpy(data, CODE_STUB, CODE_SIZE);
 }
 
 int inject_code(t_map_file *elf, t_map_file *patch)
 {
+    unsigned char   key[KEY_SIZE];
 	Elf64_Ehdr		*ehdr;
 	Elf64_Phdr		*phdr;
 	Elf64_Phdr 		*cave;
@@ -71,10 +52,18 @@ int inject_code(t_map_file *elf, t_map_file *patch)
 	phdr = (Elf64_Phdr *)(elf->data + ehdr->e_phoff);
 
 	if ((cave = find_cave(ehdr, phdr)) == NULL)
-		return (-1);
+        ABORT("[x]\tNo found cave for inject\n");
+
 	printf("[+]\tCave found with space => %lu\n", cave->p_memsz - CODE_SIZE);
 
+    if (gen_key(key) < KEY_SIZE)
+        ABORT("[x]\tNot able to generate key\n");
+
+
+    encrypt_rc4(elf->data + cave->p_offset, cave->p_memsz, key);
+
 	insert_code(elf->data + cave->p_offset + cave->p_memsz,
+                key,
 				ehdr->e_entry, cave->p_offset + cave->p_memsz);
 
 
@@ -82,8 +71,20 @@ int inject_code(t_map_file *elf, t_map_file *patch)
 	ehdr->e_entry = cave->p_offset + cave->p_memsz;
 	cave->p_memsz += CODE_SIZE;
 	cave->p_filesz += CODE_SIZE;
-	printf("INJECT SUCESSFUL \n");
+
+
 	printf("[+]\tentry point => %lx\n", ehdr->e_entry);
+    printf("[+]\tkey =>\n");
+    for (size_t i = 0; i < KEY_SIZE; i++){
+        printf("0x%02x, ", key[i]);
+    }
+
+    cave->p_flags |= PF_W;
+
+    printf("\n[++++INJECT SUCESSFUL++++] \n");
+
+
+
 
 
 //	Elf64_Shdr *shdr = (Elf64_Shdr *)(elf->data + ehdr->e_shoff);

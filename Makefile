@@ -12,7 +12,7 @@ LIBS=-lm
 _DEPS = utils.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o utils.o inject_code.o
+_OBJ = main.o utils.o inject_code.o rc4.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

@@ -1,3 +1,5 @@
+BITS 64
+
 %macro pushx 1-*
  %rep %0
    push %1
@@ -14,33 +16,38 @@
 
 		global _start
 
-		section .text
-_entry:
-        pushfq
-		pushx rax, rdi, rsi, rsp, rdx, rcx, r8, r9
-        jmp _init_start
+		section .data
 
+		key db "1234567890123456"
+		code db "my very secret message is Hello World!"
+
+		section .text
 _start:
+		pushfq
+		pushx rax, rdi, rsi, rsp, rdx, rcx, r8, r9
+
+		push 65
 		mov rdi, 1
-		pop rsi
-		mov rdx, 14
+		mov rsi, rsp
+		mov rdx, 1
 		mov rax, 1
 		syscall
+		pop rax
 
-        jmp _init_decrypt
+		mov rsi, key
+		mov rdi, code
+		call decrypt
 
 		popx rax, rdi, rsi, rsp, rdx, rcx, r8, r9
 		popfq
 
+
+
 		jmp	0xFFFFFFFF
 
-_decrypt:
+;decrypt code at [rdi] with len r11 with key at [rsi] and len 16 bytes
+decrypt:
 ;init on stack sbuff with key at [rdi]
-        pop rsi
-        lea rdi, [loop_init]
-        mov r11, 0xFF
-
-
 		push rbp,
 		mov rbp, rsp
 		sub rsp, 256
@@ -51,7 +58,7 @@ loop_init:
 		add rcx, 1
 		cmp rcx, 256
 		jl loop_init
-
+		
 		xor rcx, rcx
 		xor rdx, rdx
 loop_key_init:
@@ -86,23 +93,17 @@ loop_decrypt:
 
 ;get next byte from sbuff at [rax] and return in r9b
 get_byte:
-        add rcx, 1 ; i = (i + 1) % 256
-        and rcx, 255
-        add rdx, [rax+rcx] ; j = (j + sbuff[i]) % 256
-        and rdx, 255
-        mov byte r8b, [rax+rcx] ; swap values of s[i] and s[j]
-        mov byte r9b, [rax+rdx]
-        mov [rax+rcx], r9b
-        mov [rax+rdx], r8b
-        mov r8, [rax+rcx] ; t = (sbuff[i] + sbuff[j]) % 256
-        add r8, [rax+rdx]
-        and r8, 255
-        mov byte r9b, [rax+r8] ; return sbuff[t]
-        ret
-
-_init_start:
-        call _start
-	    woody db "....WOODY....", 0xA
-_init_decrypt:
-        call _decrypt
-        key times 16 db 0x0
+	add rcx, 1 ; i = (i + 1) % 256
+	and rcx, 255
+	add rdx, [rax+rcx] ; j = (j + sbuff[i]) % 256
+	and rdx, 255
+	mov byte r8b, [rax+rcx] ; swap values of s[i] and s[j]
+	mov byte r9b, [rax+rdx]
+	mov [rax+rcx], r9b
+	mov [rax+rdx], r8b
+	mov r8, [rax+rcx] ; t = (sbuff[i] + sbuff[j]) % 256
+	add r8, [rax+rdx]
+	and r8, 255
+	mov byte r9b, [rax+r8] ; return sbuff[t]
+	ret
+	
