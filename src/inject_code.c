@@ -2,8 +2,8 @@
 
 #define CODE_SIZE sizeof(CODE_STUB)
 #define JMP_INDEX 51
-#define INDEX_TEXT_SIZE 66
-#define INDEX_TEXT 60
+#define INDEX_TEXT_SIZE 65
+#define INDEX_TEXT 59
 
 
 
