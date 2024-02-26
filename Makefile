@@ -2,7 +2,7 @@ NAME = woody
 
 IDIR = src/include
 CC=gcc
-CFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g -fsanitize=address
+CFLAGS=-I$(IDIR) -g -fsanitize=address
 
 ODIR=obj
 SDIR=src

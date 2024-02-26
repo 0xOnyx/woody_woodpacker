@@ -29,16 +29,17 @@ _start:
 
         jmp _init_decrypt
 
+_leave:
 		popx rax, rdi, rsi, rsp, rdx, rcx, r8, r9
 		popfq
 
-		jmp	0xFFFFFFFF
+		jmp	0xFFFFFFFF ; Replace with old entry point
 
 _decrypt:
 ;init on stack sbuff with key at [rdi]
         pop rsi
-        lea rdi, [loop_init]
-        mov r11, 0xFF
+        lea rdi, [rel _decrypt] ; Replace with text section start
+        mov r11, 0xFFFFFF ; Replace with text section end
 
 
 		push rbp,
@@ -82,7 +83,7 @@ loop_decrypt:
 		jl loop_decrypt
 
 		leave
-		ret
+		jmp _leave
 
 ;get next byte from sbuff at [rax] and return in r9b
 get_byte:
