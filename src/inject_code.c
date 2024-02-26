@@ -2,6 +2,8 @@
 
 #define CODE_SIZE sizeof(CODE_STUB)
 #define JMP_INDEX 43
+#define INDEX_CODE_SIZE
+#define INDEX_TEXT
 
 
 
@@ -29,12 +31,24 @@ void insert_code(unsigned char *data, unsigned char *key,
      Elf64_Addr last_entry, Elf64_Addr new_entry)
 {
 	int32_t	rel_entry;
+	int32_t text_entry;
+	uint32_t code_size;
 
 	rel_entry =  last_entry - (new_entry + JMP_INDEX + sizeof(int32_t));
 	printf("[x] new rel entry for jump => %x\n", rel_entry);
 	memcpy(CODE_STUB + JMP_INDEX, &rel_entry, sizeof(int32_t));
     memcpy(CODE_STUB + CODE_SIZE - KEY_SIZE, &key, KEY_SIZE);
 
+	text_entry =
+
+	rel_text = get_uint64(((Elf64_Phdr *)file->text)->p_vaddr, file->endian)
+			   - (entry_addr + payload->i_text + sizeof(int32_t));
+
+
+	code_size = CODE_SIZE;
+
+	memcpy(CODE_STUB + INDEX_CODE_SIZE, CODE_SIZE, sizeof(int32_t));
+	memcpy()
 
 	memcpy(data, CODE_STUB, CODE_SIZE);
 }
