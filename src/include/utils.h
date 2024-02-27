@@ -33,9 +33,9 @@ typedef struct
 } t_map_file;
 
 off_t	file_size(int fd);
-int		load_map(t_map_file *file, const char *filename, int option);
+int		load_map(t_map_file *file, const char *filename, int option, size_t set_size);
 int 	unload_map(t_map_file *file);
-int		inject_code(t_map_file *elf, t_map_file *patch);
+int		inject_code(t_map_file *elf);
 
 void    encrypt_rc4(unsigned char *code, Elf64_Xword len, unsigned char key[KEY_SIZE]);
 int     gen_key(unsigned char key[KEY_SIZE]);
