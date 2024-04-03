@@ -16,9 +16,6 @@ _OBJ = main.o utils.o inject_code.o rc4.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
-DIR:
-	pwd
-
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 	mkdir -p $(ODIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -34,6 +31,7 @@ clean:
 
 fclean: clean
 	rm -rf $(OBJ)
+	rm -rf ./$(ODIR)
 
 re: fclean all
 
